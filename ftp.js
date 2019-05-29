@@ -14,12 +14,10 @@ const srcFTP = {
 }
 
 const ftpList = new Client();
-const ftpUpload = new Client();
 const ftpDownload = new Client();
 
 const downloadList = [];
-const uploadList = [];
-const basePath = 'public_html/premium/New/'
+const basePath = 'public_html/premium/wall/'
 
 ftpList.on('ready', function () {
     ftpList.list(basePath, function (err, list) {
@@ -62,22 +60,8 @@ ftpDownload.on('end', function () {
         const newName = file.replace('tarhan.ir', 'irangfx.com').replace(extension, '');
         if (extension === '.rar') {
             exec(`./rar-extractor.sh '${file}' '${newName}'`, (error, stdout, stderr) => {
-                uploadList.push(newName + '.rar');
                 console.log('Extract Finish => ' + newName + '.rar');
             });
         } else if (extension === '.zip') { }
-    });
-
-    ftpUpload.connect(srcFTP);
-});
-
-ftpUpload.on('ready', function () {
-    uploadList.forEach(filename => {
-        console.log("Start Uploading => " + filename);
-        ftpUpload.put(filename, basePath + filename, function (err) {
-            if (err) throw err;
-            console.log("Finish Uploading => " + filename);
-            ftpUpload.end();
-        });
     });
 });
