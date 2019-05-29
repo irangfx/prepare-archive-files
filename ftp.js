@@ -15,7 +15,7 @@ const c = new Client();
 const downloadList = [];
 
 c.on('ready', function () {
-    c.list('public_html/premium/wall', function (err, list) {
+    c.list('public_html/premium/wall/', function (err, list) {
         if (err) throw err;
 
         list.map(function (entry) {
@@ -24,7 +24,7 @@ c.on('ready', function () {
         });
 
         downloadList.map(function (file) {
-            c.get('public_html/premium/wall' + file, function (err, stream) {
+            c.get('public_html/premium/wall/' + file, function (err, stream) {
                 if (err) throw err;
                 stream.once('close', function () { c.end(); });
                 stream.pipe(fs.createWriteStream(file));
