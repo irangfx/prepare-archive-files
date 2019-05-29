@@ -1,5 +1,6 @@
 {
   "dependencies": {
+    "dotenv": "^8.0.0",
     "ftp": "^0.3.10"
   }
 }
