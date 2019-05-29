@@ -16,7 +16,7 @@ const srcFTP = {
 const c = new Client();
 const downloadList = [];
 const uploadList = [];
-const basePath = 'public_html/premium/wall/'
+const basePath = 'public_html/premium/New/'
 
 c.on('ready', function () {
     c.list(basePath, function (err, list) {
@@ -58,10 +58,10 @@ c.on('end', function () {
 
         var d = new Client();
         d.on('ready', function () {
-            uploadList.map(function (filename) {
+            uploadList.forEach(filename => {
+                console.log("Uploading => " + filename);
                 d.put(filename, basePath + filename, function (err) {
                     if (err) throw err;
-                    d.end();
                 });
             });
         });
