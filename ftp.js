@@ -30,6 +30,7 @@ c.on('ready', function () {
                 if (err) throw err;
                 stream.once('close', function () { c.end(); });
                 stream.pipe(fs.createWriteStream(file));
+                console.log('Finish Download  => ' + file);
             });
         });
 
@@ -40,6 +41,7 @@ c.on('ready', function () {
                 exec(`./rar-extractor.sh '${file}' '${newName}'`, (error, stdout, stderr) => {
                     c.put(newName + '.rar', 'public_html/premium/wall/' + newName + '.rar', function (err) {
                         if (err) throw err;
+                        console.log('Finish Upload  => ' + file);
                     });
                 });
             } else if (extension === '.zip') { }
