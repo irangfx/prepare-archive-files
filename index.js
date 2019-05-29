@@ -1,10 +1,6 @@
 var path = require('path');
 const { exec } = require('child_process');
 
-const oldPassword = 'tarhan.ir';
-const newPassword = 'irangfx.com';
-
-
 const files = []
 files.push('Creative-Designers-Icons.tarhan.ir.rar');
 files.push('Anniversary-Invitation.tarhan.ir.rar');
