@@ -13,13 +13,16 @@ const srcFTP = {
     password: process.env.FTP_PASSWORD
 }
 
-const c = new Client();
+const ftpList = new Client();
+const ftpUpload = new Client();
+const ftpDownload = new Client();
+
 const downloadList = [];
 const uploadList = [];
 const basePath = 'public_html/premium/New/'
 
-c.on('ready', function () {
-    c.list(basePath, function (err, list) {
+ftpList.on('ready', function () {
+    ftpList.list(basePath, function (err, list) {
         if (err) throw err;
 
         list.map(function (entry) {
@@ -27,50 +30,54 @@ c.on('ready', function () {
                 downloadList.push(entry.name);
         });
 
-        downloadList.map(function (file) {
-            c.get(basePath + file, function (err, stream) {
-                if (err) throw err;
-                stream.once('close', function () { c.end(); });
-                stream.pipe(fs.createWriteStream(file));
-                console.log('Finish Download  => ' + file);
-            });
-        });
-
-        downloadList.forEach(file => {
-            const extension = path.extname(file);
-            const newName = file.replace('tarhan.ir', 'irangfx.com').replace(extension, '');
-            if (extension === '.rar') {
-                exec(`./rar-extractor.sh '${file}' '${newName}'`, (error, stdout, stderr) => {
-                    uploadList.push(newName + '.rar');
-                });
-            } else if (extension === '.zip') { }
-        });
-
-        c.end();
+        ftpList.end();
     });
 });
 
-c.on('end', function () {
-
-    if (uploadList.length > 0) {
-
-        console.log("Uploading...");
-
-        var d = new Client();
-        d.on('ready', function () {
-            uploadList.forEach(filename => {
-                console.log("Uploading => " + filename);
-                d.put(filename, basePath + filename, function (err) {
-                    if (err) throw err;
-                });
-            });
-        });
-
-        d.connect(srcFTP);
-
-    } else {
-        console.log("Error: Download list empty.");
-    }
+ftpList.on('end', function () {
+    if (downloadList.length > 0)
+        ftpDownload.connect(srcFTP);
+    else console.log("Error: Download list empty.");
 });
 
-c.connect(srcFTP);
+ftpList.connect(srcFTP);
+
+ftpDownload.on('ready', function () {
+    downloadList.forEach(file => {
+        console.log('Start Download  => ' + file);
+        ftpDownload.get(basePath + file, function (err, stream) {
+            if (err) throw err;
+            stream.once('close', function () { ftpDownload.end(); });
+            stream.pipe(fs.createWriteStream(file));
+            console.log('Finish Download  => ' + file);
+        });
+    });
+
+    ftpDownload.end();
+});
+
+ftpDownload.on('end', function () {
+    downloadList.forEach(file => {
+        const extension = path.extname(file);
+        const newName = file.replace('tarhan.ir', 'irangfx.com').replace(extension, '');
+        if (extension === '.rar') {
+            exec(`./rar-extractor.sh '${file}' '${newName}'`, (error, stdout, stderr) => {
+                uploadList.push(newName + '.rar');
+                console.log('Extract Finish => ' + newName + '.rar');
+            });
+        } else if (extension === '.zip') { }
+    });
+
+    ftpUpload.connect(srcFTP);
+});
+
+ftpUpload.on('ready', function () {
+    uploadList.forEach(filename => {
+        console.log("Start Uploading => " + filename);
+        ftpUpload.put(filename, basePath + filename, function (err) {
+            if (err) throw err;
+            console.log("Finish Uploading => " + filename);
+            ftpUpload.end();
+        });
+    });
+});
