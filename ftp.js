@@ -33,7 +33,7 @@ c.on('ready', function () {
             });
         });
 
-        files.forEach(file => {
+        downloadList.forEach(file => {
             const extension = path.extname(file);
             const newName = file.replace('tarhan.ir', 'irangfx.com').replace(extension, '');
             if (extension === '.rar') {
