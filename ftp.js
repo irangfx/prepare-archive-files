@@ -15,9 +15,11 @@ const srcFTP = {
 
 const c = new Client();
 const downloadList = [];
+const uploadList = [];
+const basePath = 'public_html/premium/wall/'
 
 c.on('ready', function () {
-    c.list('public_html/premium/wall/', function (err, list) {
+    c.list(basePath, function (err, list) {
         if (err) throw err;
 
         list.map(function (entry) {
@@ -26,7 +28,7 @@ c.on('ready', function () {
         });
 
         downloadList.map(function (file) {
-            c.get('public_html/premium/wall/' + file, function (err, stream) {
+            c.get(basePath + file, function (err, stream) {
                 if (err) throw err;
                 stream.once('close', function () { c.end(); });
                 stream.pipe(fs.createWriteStream(file));
@@ -39,10 +41,7 @@ c.on('ready', function () {
             const newName = file.replace('tarhan.ir', 'irangfx.com').replace(extension, '');
             if (extension === '.rar') {
                 exec(`./rar-extractor.sh '${file}' '${newName}'`, (error, stdout, stderr) => {
-                    c.put(newName + '.rar', 'public_html/premium/wall/' + newName + '.rar', function (err) {
-                        if (err) throw err;
-                        console.log('Finish Upload  => ' + file);
-                    });
+                    uploadList.push(newName + '.rar');
                 });
             } else if (extension === '.zip') { }
         });
@@ -52,7 +51,26 @@ c.on('ready', function () {
 });
 
 c.on('end', function () {
-    console.log(downloadList);
+
+    if (uploadList.length > 0) {
+
+        console.log("Uploading...");
+
+        var d = new Client();
+        d.on('ready', function () {
+            uploadList.map(function (filename) {
+                d.put(filename, basePath + filename, function (err) {
+                    if (err) throw err;
+                    d.end();
+                });
+            });
+        });
+
+        d.connect(srcFTP);
+
+    } else {
+        console.log("Error: Download list empty.");
+    }
 });
 
 c.connect(srcFTP);
