@@ -1,7 +1,9 @@
 require('dotenv').config()
 
 const fs = require('fs');
+var path = require('path');
 const Client = require('ftp');
+const { exec } = require('child_process');
 
 // SOURCE FTP CONNECTION SETTINGS
 const srcFTP = {
@@ -29,6 +31,18 @@ c.on('ready', function () {
                 stream.once('close', function () { c.end(); });
                 stream.pipe(fs.createWriteStream(file));
             });
+        });
+
+        files.forEach(file => {
+            const extension = path.extname(file);
+            const newName = file.replace('tarhan.ir', 'irangfx.com').replace(extension, '');
+            if (extension === '.rar') {
+                exec(`./rar-extractor.sh '${file}' '${newName}'`, (error, stdout, stderr) => {
+                    c.put(newName + '.rar', 'public_html/premium/wall/' + newName + '.rar', function (err) {
+                        if (err) throw err;
+                    });
+                });
+            } else if (extension === '.zip') { }
         });
 
         c.end();
