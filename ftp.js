@@ -3,7 +3,13 @@ require('dotenv').config()
 const fs = require('fs');
 var path = require('path');
 const Client = require('ftp');
+const readline = require('readline');
 const { exec } = require('child_process');
+
+const rl = readline.createInterface({
+    input: process.stdin,
+    output: process.stdout
+});
 
 const srcFTP = {
     host: process.env.FTP_HOST,
@@ -16,9 +22,18 @@ const ftpList = new Client();
 const ftpUpload = new Client();
 const ftpDownload = new Client();
 
+let basePath = '';
 const UploadList = [];
 const downloadList = [];
-const basePath = '/imap/pz10448.parspack.net/public_html/premium/wall/';
+
+rl.question('- Plase enter crawle path : ', answer => {
+    console.log(`Roboot crawle path => ${answer}`);
+    
+    basePath = answer;
+    ftpList.connect(srcFTP);
+
+    rl.close();
+});
 
 ftpList.on('ready', function () {
     ftpList.list(basePath, function (err, list) {
@@ -87,7 +102,3 @@ ftpUpload.on('ready', function () {
         });
     });
 });
-
-
-// Run FTP
-ftpList.connect(srcFTP);

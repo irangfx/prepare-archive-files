@@ -64,5 +64,5 @@ cd $newDir
 sed 's+www.tarhan.ir/academy+irangfx.com+g' Tarhan.ir.url > IranGFX.com.url
 rm Tarhan.ir.url
 cd ..
-rar -p$newPassword a -r -rr10 $2 ./$newDir
+rar -p$newPassword a -r -rr5 $2 ./$newDir
 rm -rf $newDir
