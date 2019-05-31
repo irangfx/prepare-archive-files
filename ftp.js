@@ -17,13 +17,13 @@ const ftpList = new Client();
 const ftpDownload = new Client();
 
 const downloadList = [];
-const basePath = 'public_html/premium/wall/'
+const basePath = '/imap/pz10448.parspack.net/public_html/premium/New/'
 
 ftpList.on('ready', function () {
     ftpList.list(basePath, function (err, list) {
         if (err) throw err;
 
-        list.map(function (entry) {
+        list.forEach(entry => {
             if (entry.name.match(/\.rar$/))
                 downloadList.push(entry.name);
         });
@@ -33,7 +33,7 @@ ftpList.on('ready', function () {
 });
 
 ftpList.on('end', function () {
-    if (downloadList.length > 0)
+    if (downloadList.length > 0)        
         ftpDownload.connect(srcFTP);
     else console.log("Error: Download list empty.");
 });

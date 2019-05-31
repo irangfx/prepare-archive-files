@@ -21,16 +21,18 @@ fs.readdir('./', function (err, files) {
     files.filter(function (file) {
         return file.match(/\.rar$/)
     }).forEach(function (file) {
+        console.log(file);
+        
 
-        const ftpUpload = new Client();
+        // const ftpUpload = new Client();
 
-        ftpUpload.on('ready', function () {
-            ftpUpload.put(file, basePath + file, function (err) {
-                if (err) throw err;
-                ftpUpload.end();
-            });
-        });
+        // ftpUpload.on('ready', function () {
+        //     ftpUpload.put(file, basePath + file, function (err) {
+        //         if (err) throw err;
+        //         ftpUpload.end();
+        //     });
+        // });
 
-        ftpUpload.connect(srcFTP);
+        // ftpUpload.connect(srcFTP);
     });
 });
