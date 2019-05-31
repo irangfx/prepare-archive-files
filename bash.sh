@@ -52,15 +52,15 @@ process () {
   dir=${1%.*}
   case "$1" in
     *.rar|*.RAR) program="unrar x -p$oldPassword";;
-    *.zip|*.ZIP) program="unzip";;
+    *.zip|*.ZIP) program="unzip -P $oldPassword";;
     *) echo >&2 "$0: $1: unsupported archive type"; exit 4;;
   esac
   if [ -d "$dir" ]; then
     echo >&2 "$0: $dir: directory already exists"
     exit 1
   fi
-  echo $program;
-  # extract "$1" "$dir" "$program"
+  # echo $program;
+  extract "$1" "$dir" "$program"
 }
 
 process "$1";
