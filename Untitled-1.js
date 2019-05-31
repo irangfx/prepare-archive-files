@@ -5,27 +5,27 @@ var path = require('path');
 const Client = require('ftp');
 const { exec } = require('child_process');
 
-// SOURCE FTP CONNECTION SETTINGS
-const srcFTP = {
+var EasyFtp = require('easy-ftp');
+var ftp = new EasyFtp();
+
+var config = {
     host: process.env.FTP_HOST,
     port: process.env.FTP_PORT,
     user: process.env.FTP_USERNAME,
-    password: process.env.FTP_PASSWORD
-}
+    password: process.env.FTP_PASSWORD,
+    type : 'ftp'
+};
+ 
+ftp.connect(config);
 
-const ftpList = new Client();
-const ftpUpload = new Client();
-const ftpDownload = new Client();
-
-const UploadList = [];
 const downloadList = [];
-const basePath = '/imap/pz10448.parspack.net/public_html/premium/New/'
+const basePath = 'public_html/premium/wall/'
 
 ftpList.on('ready', function () {
     ftpList.list(basePath, function (err, list) {
         if (err) throw err;
 
-        list.forEach(entry => {
+        list.map(function (entry) {
             if (entry.name.match(/\.rar$/))
                 downloadList.push(entry.name);
         });
@@ -63,22 +63,7 @@ ftpDownload.on('end', function () {
         if (extension === '.rar') {
             exec(`./rar-extractor.sh '${file}' '${newName}'`, (error, stdout, stderr) => {
                 console.log('Extract Finish => ' + newName + '.rar');
-                UploadList.push(newName + '.rar');
             });
         } else if (extension === '.zip') { }
-    });
-
-    ftpUpload.connect(srcFTP);
-});
-
-ftpUpload.on('ready', function () {
-    UploadList.forEach(file => {
-        console.log('Uplaod File => ' + file);
-        
-        ftpUpload.put(file, basePath + file, function (err) {
-            if (err) throw err;
-            console.log('Uplaoded File => ' + file);
-            ftpUpload.end();
-        });
     });
 });

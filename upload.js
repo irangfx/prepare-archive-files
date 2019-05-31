@@ -3,6 +3,7 @@ require('dotenv').config()
 const fs = require('fs');
 var path = require('path');
 const Client = require('ftp');
+const { exec } = require('child_process');
 
 // SOURCE FTP CONNECTION SETTINGS
 const srcFTP = {
@@ -12,27 +13,26 @@ const srcFTP = {
     password: process.env.FTP_PASSWORD
 }
 
-const basePath = 'public_html/premium/wall/';
+const ftpUpload = new Client();
 
+const downloadList = [];
+const basePath = '/imap/pz10448.parspack.net/public_html/premium/New/'
 
-fs.readdir('./', function (err, files) {
-    if (err) throw err;
+ftpUpload.on('ready', function () {
+    ftpUpload.list(basePath, function (err, list) {
+        if (err) throw err;
 
-    files.filter(function (file) {
-        return file.match(/\.rar$/)
-    }).forEach(function (file) {
-        console.log(file);
-        
+        list.forEach(entry => {
+            if (entry.name.match(/\.rar$/))
+                downloadList.push(entry.name);
+        });
 
-        // const ftpUpload = new Client();
-
-        // ftpUpload.on('ready', function () {
-        //     ftpUpload.put(file, basePath + file, function (err) {
-        //         if (err) throw err;
-        //         ftpUpload.end();
-        //     });
-        // });
-
-        // ftpUpload.connect(srcFTP);
+        ftpUpload.end();
     });
 });
+
+ftpUpload.on('end', function () {
+    console.log("Error: Download list empty.");
+});
+
+ftpUpload.connect(srcFTP);
