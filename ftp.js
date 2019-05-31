@@ -28,7 +28,7 @@ const downloadList = [];
 
 rl.question('- Plase enter crawle path : ', answer => {
     console.log(`Roboot crawle path => ${answer}`);
-    
+
     basePath = answer;
     ftpList.connect(srcFTP);
 
@@ -62,12 +62,7 @@ ftpDownload.on('ready', function () {
         }
 
         console.log('Start Download  => ' + file);
-        ftpDownload.get(basePath + file, function (err, stream) {
-            if (err) throw err;
-            stream.once('close', function () { ftpDownload.end(); });
-            stream.pipe(fs.createWriteStream(file));
-            console.log('Finish Download  => ' + file);
-        });
+        download(file);
     });
 
     ftpDownload.end();
@@ -102,3 +97,12 @@ ftpUpload.on('ready', function () {
         });
     });
 });
+
+async function download(file) {
+    await ftpDownload.get(basePath + file, function (err, stream) {
+        if (err) throw err;
+        stream.once('close', function () { ftpDownload.end(); });
+        stream.pipe(fs.createWriteStream(file));
+        console.log('Finish Download  => ' + file);
+    });
+}
