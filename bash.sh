@@ -3,10 +3,6 @@
 oldPassword='tarhan.ir';
 newPassword='irangfx.com';
 
-# Extract the archive $1 to a directory $2 with the program $3. If the
-# archive contains a single top-level directory, that directory
-# becomes $2. Otherwise $2 contains all the files at the root of the
-# archive.
 extract () (
   set -e
   archive=$1
@@ -47,7 +43,6 @@ extract () (
   fi
 )
 
-# Extract the archive $1.
 process () {
   dir=${1%.*}
   case "$1" in
@@ -59,10 +54,7 @@ process () {
     echo >&2 "$0: $dir: directory already exists"
     exit 1
   fi
-  # echo $program;
   extract "$1" "$dir" "$program"
 }
 
 process "$1";
-
-# echo "$1 - $2 - $3";

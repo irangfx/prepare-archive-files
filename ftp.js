@@ -60,20 +60,17 @@ ftpDownload.on('ready', function () {
 
 ftpDownload.on('end', function () {
     downloadList.forEach(file => {
-        const extension = path.extname(file);
-        const newName = file.replace('tarhan.ir', 'irangfx.com').replace(extension, '');
+        const newName = file.replace('tarhan.ir', 'irangfx.com');
 
-        if (fs.existsSync(newName + '.rar')) {
+        if (fs.existsSync(newName)) {
             console.log('File Already Exist => ' + file);
             return;
         }
 
-        if (extension === '.rar') {
-            exec(`./rar-extractor.sh '${file}' '${newName}'`, (error, stdout, stderr) => {
-                console.log('Extract Finish => ' + newName + '.rar');
-                UploadList.push(newName + '.rar');
-            });
-        } else if (extension === '.zip') { }
+        exec(`./rar-extractor.sh '${file}' '${newName}'`, (error, stdout, stderr) => {
+            console.log('Extract Finish => ' + newName);
+            UploadList.push(newName);
+        });
     });
 
     // ftpUpload.connect(srcFTP);
