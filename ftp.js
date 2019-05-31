@@ -18,14 +18,14 @@ const ftpDownload = new Client();
 
 const UploadList = [];
 const downloadList = [];
-const basePath = '/imap/pz10448.parspack.net/public_html/premium/New/';
+const basePath = '/imap/pz10448.parspack.net/public_html/premium/wall/';
 
 ftpList.on('ready', function () {
     ftpList.list(basePath, function (err, list) {
         if (err) throw err;
 
         list.forEach(entry => {
-            if (entry.name.match(/\.rar$/))
+            if (entry.name.match(/\.(rar|zip)$/))
                 downloadList.push(entry.name);
         });
 
@@ -73,7 +73,7 @@ ftpDownload.on('end', function () {
         });
     });
 
-    // ftpUpload.connect(srcFTP);
+    ftpUpload.connect(srcFTP);
 });
 
 ftpUpload.on('ready', function () {
